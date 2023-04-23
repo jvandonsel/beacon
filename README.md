@@ -1,2 +1,2 @@
 
-Weather Beacon
+Weather Beacon for ESP32
