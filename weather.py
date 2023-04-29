@@ -45,8 +45,6 @@ RAIN_CODES = {
     WeatherCode.LIGHT_SHOWERS,
     WeatherCode.SHOWERS,
     WeatherCode.HEAVY_SHOWERS,
-    WeatherCode.SNOW_SHOWERS,
-    WeatherCode.SNOW_SHOWERS2,
     WeatherCode.THUNDERSTORM,
     WeatherCode.THUNDERSTORM_WITH_HAIL,
     WeatherCode.THUNDERSTORM_WITH_HAIL2
@@ -61,17 +59,54 @@ SNOW_CODES = {
     WeatherCode.SNOW_SHOWERS2
 }
 
+CLOUD_CODES = {
+    WeatherCode.CLOUDY,
+    WeatherCode.PARTLY_CLOUDY
+}
+
+# Coarse weather classification
+class WeatherValue:
+    UNKNOWN = 0
+    SUN = 1
+    RAIN = 2
+    SNOW = 3
+    CLOUDS = 4
+
+    weather_value_to_string = {
+        UNKNOWN: "UNKNOWN",
+        SUN: "SUN",
+        RAIN: "RAIN",
+        SNOW: "SNOW",
+        CLOUDS: "CLOUDS"
+    }
+
+    def to_string(value):
+        return WeatherValue.weather_value_to_string[value]
+
+
 def is_rain(code):
     return code in RAIN_CODES
 
 def is_snow(code):
     return code in SNOW_CODES
 
-def get_weather_code(url):
+def is_sun(code):
+    return code == WeatherCode.SUNNY
+
+def is_clouds(code):
+    return code in CLOUD_CODES
+
+def get_weather_url(latitude, longitude):
+    return f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=weathercode&timezone=auto&forecast_days=1"
+
+def query_weather_code(url):
     """
     Queries the weather API for the current weather for the current location.
     Returns the numeric WMO weather code. Returns -1 it not found.
+
+    TODO: Be smarter about choosing the day/time of the weather code.
     """
+
     resp = {}
     code = -1
     try:
@@ -85,3 +120,21 @@ def get_weather_code(url):
         if resp != {}:
             resp.close()
     return code
+
+def query_weather(latitude, longitude):
+    """
+    Query the weather for the given lat/long.
+    @return a WeatherValue
+    """
+    url = get_weather_url(latitude, longitude)
+    code = query_weather_code(url)
+    if is_sun(code):
+        return WeatherValue.SUN
+    if is_clouds(code):
+        return WeatherValue.CLOUDS
+    if is_rain(code):
+        return WeatherValue.RAIN
+    if is_snow(code):
+        return WeatherValue.SNOW
+    
+    return WeatherValue.UNKNOWN
