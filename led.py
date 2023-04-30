@@ -37,6 +37,11 @@ def create_pwm_pins():
     return PwmPins(init_pwm(RED_GPIO, 1.0), init_pwm(GREEN_GPIO, 1.0), init_pwm(BLUE_GPIO, 1.0))
 
 def init_pwm(pin, duty):
+    """
+    Configure the given pin for PWM.
+    @param pin Pin number
+    @param duty Duty cycle, 0.0-1.0
+    """
     pwm = PWM(Pin(pin))
     freq = int(1000000.0/LED_PWM_PERIOD_US)
     duty_ns =  LED_PWM_PERIOD_US * duty * 1000

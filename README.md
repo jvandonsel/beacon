@@ -18,29 +18,40 @@ There's an old mnemonic poem for the color scheme of the Berkeley Building beaco
 >Flashing red, snow instead.
 </em>
 
+The Berkeley Beacon also will flash red during baseball season to indicate that the Red Sox home game has been canceled. 
+
 ## Materials
 -  A lantern. I acquired an old ship's lantern on EBay
 - [SparkFun Thing Plus](https://www.sparkfun.com/products/17381) ESP32 board. Chosen because of its external antenna connector, important if the device is mounted in a metal lantern
 - [WiFi Antenna](https://www.sparkfun.com/products/18086)
-- 3x IRL540PBF N-Chanel MOSFETs, chosen because of their low Gate-Source voltage threshold. This allows them to be driven directly from a 3.3v GPIO pin.
-- [RGB LEDs](https://www.adafruit.com/product/848) 
+- 3x IRL540PBF N-Chanel MOSFETs
+- 4x [10 mm RGB LEDs](https://www.adafruit.com/product/848) 
 - Resistors
 - Misc. Hardware
 
+## Hardware Notes
+The IRL540PBF N-Channel MOSFETs are really handy for this sort of LED PWM application. They have a low gate-source voltage threshold and so can be driven directly from the 3.3v GPIO pins on the ESP32 for PWM.
 
-## Construction
-TODO
+The LEDs I chose have a recommended maximum current of 20 mA per color. I used 4 LEDS in my beacon, so this is a maximum of 80 mA per color, or 240 mA total.  Resistor values were chosen to keep the current just under this per-LED current limit, with a 5V rail. They can certainly be overdriven for a brighter beacon, but obviously their lifetime will be shortened.
+
 
 ## Software Notes
 This is my first time using [MicroPython](https://docs.micropython.org). It has some deficiencies, especially when it comes to threading, but it's certainly quicker to throw projects together in MicroPython than writing directly to the Espressif IDF API in C.
 
 I ended up single-threading everything, with polling loops and using select() to watch for serial characters from the user.
 
+## Construction Notes
+TODO
+
 ## Weather API
-The beacon uses [OpenMeteo](https://open-meteo.com/en/docs) for the weather API.  My first choice was the [National Weather Service API](https://www.weather.gov/documentation/services-web-api) but the SSL certificate logic in MicroPython choked on the site.
+The beacon uses [OpenMeteo](https://open-meteo.com/en/docs) for the weather API. This API returns JSON weather info with WMO numeric weather codes rather than text descriptions.
+
+My first choice was the [National Weather Service API](https://www.weather.gov/documentation/services-web-api) but the SSL certificate logic in MicroPython choked on the site.
 
 ## Usage Notes
-The beacon must be configured with the latitude and longitude for determining local weather. In addition, the WiFi SSID and password must be set.  Connect a computer to the USB port, open a serial console(115200) and hit a key to enter the interactive console. From there, you can run the following commands:
+The beacon must be configured with the latitude and longitude for determining local weather. In addition, the WiFi SSID and password must be set.  These are stored in non-volatile storage (NVS) on the ESP32 and will be retrieved on the next boot.
+
+Connect a computer to the USB port, open a serial console (115200) and hit a key to enter the interactive menu. From there, you can run the following commands:
 
 - **location** - Prompts you for latitide and longitude
 - **wifi** - Prompts you for SSID and WiFi password
