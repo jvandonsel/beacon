@@ -25,10 +25,13 @@ class RGB:
         return f"r:{self.red} g:{self.green} b:{self.blue}"
     
 
-WHITE = RGB(0xFF, 0xFF, 0xFF)
-RED   = RGB(0xFF, 0, 0)
-GREEN = RGB(0, 0xFF, 0)
-BLUE  = RGB(0, 0, 0xFF)
+WHITE    = RGB(0xFF, 0xFF, 0xFF)
+RED      = RGB(0xFF, 0, 0)
+GREEN    = RGB(0, 0xFF, 0)
+BLUE     = RGB(0, 0, 0xFF)
+YELLOW   = RGB(0xFF, 0x96, 0)
+AQUA     = RGB(0, 0xFF, 0x96)
+MAGNENTA = RGB(0xFF, 0, 0xFF)
 
 def create_pwm_pins():
     return PwmPins(init_pwm(RED_GPIO, 1.0), init_pwm(GREEN_GPIO, 1.0), init_pwm(BLUE_GPIO, 1.0))

@@ -9,23 +9,7 @@ import led
 import weather
 import wifi
 
-WEATHER_POLL_INTERVAL_SECS = 60
-
-# Create PWM pins
-pwms = led.create_pwm_pins()
-
-# Blue during startup
-led.solid_rgb(pwms, led.BLUE)
-
-# Start the WiFi network
-wifi.start_network()
-
-# White until we get the weather
-led.solid_rgb(pwms, led.WHITE)
-
-# Read our location from NVS
-latitude, longitude = utils.read_location_from_nvs()
-print("Read lat=", latitude, "longitude=", longitude)
+WEATHER_POLL_INTERVAL_SECS = 3600
 
 def weather_to_color(w):
     """
@@ -37,20 +21,37 @@ def weather_to_color(w):
     if w == weather.WeatherValue.CLOUDS:
         return led.BLUE, True
     if w == weather.WeatherValue.RAIN:
-        # return led.RED, False
-        return led.RED, True
-        
+        return led.RED, False
     if w == weather.WeatherValue.SNOW:
         return led.RED, True
     
+    # not found
     return led.WHITE, False
 
+# Create PWM pins
+pwms = led.create_pwm_pins()
+
+# Color during startup
+led.solid_rgb(pwms, led.MAGNENTA)
+
+# Start the WiFi network. Will block until a wifi network is found, or until
+# a key is hit.
+wifi.start_network()
+
+# White until we get the weather
+led.solid_rgb(pwms, led.WHITE)
+
+# Read our location from NVS
+latitude, longitude = utils.read_location_from_nvs()
+print("Read lat=", latitude, "longitude=", longitude)
 
 while True:
     wv = weather.query_weather(latitude, longitude)
     color, pulse = weather_to_color(wv)
     print("Weather:", weather.WeatherValue.to_string(wv), " color:", color.to_str(), ", pulse:", pulse)
 
+    # Display an LED pattern based on the weather value. These calls block until a serial character is received
+    # or until the time interval has expired.
     result = 0
     if pulse:
         result = led.breathe_wait(pwms, color, WEATHER_POLL_INTERVAL_SECS)
@@ -58,7 +59,7 @@ while True:
         result = led.solid_wait(pwms, color, WEATHER_POLL_INTERVAL_SECS)
 
     if result == 1:
-        # Key was hit, enter console
+        # Key was hit, enter console. Blocks until the user types 'exit' or reboots.
         utils.console()
 
 
