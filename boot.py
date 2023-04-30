@@ -24,6 +24,8 @@ def weather_to_color(w):
         return led.RED, False
     if w == weather.WeatherValue.SNOW:
         return led.RED, True
+    if w == weather.WeatherValue.FOG:
+        return led.GREEN, True
     
     # not found
     return led.WHITE, False

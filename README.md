@@ -18,7 +18,7 @@ There's an old mnemonic poem for the color scheme of the Berkeley Building beaco
 >Flashing red, snow instead.
 </em>
 
-The Berkeley Beacon also will flash red during baseball season to indicate that the Red Sox home game has been canceled. 
+The Berkeley Beacon also will flash red during baseball season to indicate that the Red Sox home game has been canceled. My ESP32 beacon doesn't.
 
 ## Materials
 -  A lantern. I acquired an old ship's lantern on EBay
@@ -70,9 +70,11 @@ Solid <span style="color:red">red</span> - Rain
 
 Blinking <span style="color:red">red</span> - Snow
 
+Blinking <span style="color:green">green</span> - Fog
+
 Solid <span style="color:magenta">magenta</span> - No WiFi connection
 
-Solid white - No weather received
+Solid white - No weather received, or unknown weather code
 
 
 

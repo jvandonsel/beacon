@@ -64,6 +64,11 @@ CLOUD_CODES = {
     WeatherCode.PARTLY_CLOUDY
 }
 
+FOG_CODES = {
+    WeatherCode.FOGGY, 
+    WeatherCode.FOGGY2
+}
+
 # Coarse weather classification
 class WeatherValue:
     UNKNOWN = 0
@@ -71,13 +76,15 @@ class WeatherValue:
     RAIN = 2
     SNOW = 3
     CLOUDS = 4
+    FOG = 5
 
     weather_value_to_string = {
         UNKNOWN: "UNKNOWN",
         SUN: "SUN",
         RAIN: "RAIN",
         SNOW: "SNOW",
-        CLOUDS: "CLOUDS"
+        CLOUDS: "CLOUDS",
+        FOG: "FOG"
     }
 
     def to_string(value):
@@ -95,6 +102,9 @@ def is_sun(code):
 
 def is_clouds(code):
     return code in CLOUD_CODES
+
+def is_fog(code):
+    return code in FOG_CODES
 
 def get_weather_url(latitude, longitude):
     return f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=weathercode&timezone=auto&forecast_days=1"
@@ -136,5 +146,8 @@ def query_weather(latitude, longitude):
         return WeatherValue.RAIN
     if is_snow(code):
         return WeatherValue.SNOW
+    if is_fog(code):
+        return WeatherValue.FOG
     
+    print("Unrecognized weather code ", code)
     return WeatherValue.UNKNOWN
