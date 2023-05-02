@@ -110,6 +110,7 @@ def get_weather_url(latitude, longitude):
     return f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=weathercode&timezone=auto&forecast_days=1"
 
 def query_weather_code(url):
+    # type: (str) -> int
     """
     Queries the weather API for the current weather for the current location.
     Returns the numeric WMO weather code. Returns -1 it not found.
@@ -117,21 +118,18 @@ def query_weather_code(url):
     TODO: Be smarter about choosing the day/time of the weather code.
     """
 
-    resp = {}
     code = -1
-    try:
-        resp = urequests.get(url)
-        print("status=:", resp.status_code)
-        code = resp.json()['daily']['weathercode'][0]
-    except Exception as e:
-        print("Caught error querying weather API:", e)
-    finally:
-        # Micropython is very unhappy if you don't close responses
-        if resp != {}:
-            resp.close()
+    with urequests.get(url) as resp:
+        try:
+            print("status=:", resp.status_code)
+            code = resp.json()['daily']['weathercode'][0]
+        except Exception as e:
+            print("Caught error querying weather API:", e)
+
     return code
 
 def query_weather(latitude, longitude):
+    # type:  (float, float) -> WeatherValue
     """
     Query the weather for the given lat/long.
     @return a WeatherValue

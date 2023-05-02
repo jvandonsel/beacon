@@ -3,6 +3,8 @@
 
 This project is meant to replicate the famous weather beacon from Boston's [Berkeley Building](https://en.wikipedia.org/wiki/Berkeley_Building), formerly known as the Old John Hancock Building.
 
+This replica is housed in a small lantern and is powered by a USB cable connected to a wall adapter. An ESP32 inside the beacon connects to the local WiFi network to fetch the weather forecast for your location. It then lights LEDs with a color and pattern indicating the weather.
+
 
 ## The Berkeley Building Weather Beacon
 There's an old mnemonic poem for the color scheme of the Berkeley Building beacon:
@@ -34,6 +36,8 @@ The IRL540PBF N-Channel MOSFETs are really handy for this sort of LED PWM applic
 
 The LEDs I chose have a recommended maximum current of 20 mA per color. I used 4 LEDS in my beacon, so this is a maximum of 80 mA per color, or 240 mA total.  Resistor values were chosen to keep the current just under this per-LED current limit, with a 5V rail. They can certainly be overdriven for a brighter beacon, but obviously their lifetime will be shortened.
 
+## Schematic
+TODO
 
 ## Software Notes
 This is my first time using [MicroPython](https://docs.micropython.org). It has some deficiencies, especially when it comes to threading, but it's certainly quicker to throw projects together in MicroPython than writing directly to the Espressif IDF API in C.
@@ -77,4 +81,5 @@ Solid <span style="color:magenta">magenta</span> - No WiFi connection
 Solid white - No weather received, or unknown weather code
 
 
-
+## TODO
+- Determine user location dynamically rather than requiring a latitude/longitude input

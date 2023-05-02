@@ -4,6 +4,11 @@ import utils
 import time
 
 def start_network():
+    # type: () -> None
+    """
+    Connect to the WiFi network with credentials read from NVS.
+    Also starts WebREPL.
+    """
 
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)

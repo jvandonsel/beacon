@@ -66,18 +66,23 @@ spoll=uselect.poll()
 spoll.register(sys.stdin,uselect.POLLIN)
 
 def read_one_char():
+    # type: () -> str
+    """
+    Reads a single character from the serial console.
+    @return The character read, or None if no character was read.
+    """
     return(sys.stdin.read(1) if spoll.poll(0) else None)
 
 def check_for_prompt():
+    # type: () -> None
     """
     Checks if a serial character is present. If so, enters the interactive console.
     """
     if read_one_char():
             console()
 
-
-
 def save_location_to_nvs(latitude, longitude):
+    # type: (float, float) -> None
     """
     Save latitude/longitude values to non-volatile storage.
     @param latitude Latitude (float)
@@ -90,6 +95,7 @@ def save_location_to_nvs(latitude, longitude):
 
 
 def read_location_from_nvs():
+    # type:  () -> (float, float)
     """
     Loads the latitude/longitude from non-volatile storage.
     @return (latitude, longitude) as floats, or (0,0) if not present
@@ -104,6 +110,7 @@ def read_location_from_nvs():
         return (0,0)
 
 def save_wifi_info_to_nvs(ssid, password):
+    # type:  (str, str) -> None
     """
     Saves WiFi SSID and password to non-volatile storage.
     @param ssid SSID string
@@ -115,6 +122,7 @@ def save_wifi_info_to_nvs(ssid, password):
     nvs.commit()
 
 def read_wifi_info_from_nvs():
+    # type:  () -> (str, str)
     """
     Loads WiFi SSID and password from non-volatile storage.
     @return (ssid, password), or ('', '') if not present
