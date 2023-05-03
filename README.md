@@ -44,6 +44,8 @@ This is my first time using [MicroPython](https://docs.micropython.org). It has 
 
 I ended up single-threading everything, with polling loops and using select() to watch for serial characters from the user.
 
+There's no Micropython type annotation library available, but comment-based type annotations kinda work, and are better than nothing.
+
 ## Construction Notes
 TODO
 

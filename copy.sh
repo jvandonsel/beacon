@@ -23,4 +23,4 @@ copy_file boot.py
 copy_file utils.py
 copy_file weather.py
 copy_file wifi.py
-copy_file led.py
+copy_file leds.py

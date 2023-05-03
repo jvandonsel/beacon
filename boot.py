@@ -1,46 +1,46 @@
 ###################################################################################################
-# Weather Beacon for ESP32
+# Weather Beacon for ESP32 in Micropython
 # @author Jim Van Donsel
 # @since 2023/04/23
 ###################################################################################################
 
 import utils
-import led
+import leds
 import weather
 import wifi
 
 def weather_to_color(w):
-    # type: (weather.WeatherValue) -> [led.RGB, bool)
+    # type: (weather.WeatherValue) -> (leds.RGB, bool)
     """
     Given a WeatherValue, determine the color and pattern.
     @return (RGB, pulse) RGB: color to display, pulse: if True, pulse, else solid.
     """
     if w == weather.WeatherValue.SUN:
-        return led.BLUE, False
+        return leds.BLUE, False
     if w == weather.WeatherValue.CLOUDS:
-        return led.BLUE, True
+        return leds.BLUE, True
     if w == weather.WeatherValue.RAIN:
-        return led.RED, False
+        return leds.RED, False
     if w == weather.WeatherValue.SNOW:
-        return led.RED, True
+        return leds.RED, True
     if w == weather.WeatherValue.FOG:
-        return led.GREEN, True
+        return leds.GREEN, True
     
     # not found
-    return led.WHITE, False
+    return leds.WHITE, False
 
 # Create PWM pins
-pwmPins = led.create_pwm_pins()
+pwmPins = leds.create_pwm_pins()
 
 # Color during startup
-led.solid_rgb(pwmPins, led.MAGNENTA)
+leds.solid_rgb(pwmPins, leds.MAGNENTA)
 
 # Start the WiFi network. Will block until a wifi network is found, 
 # or until a key is hit.
 wifi.start_network()
 
 # Display white until we get the weather
-led.solid_rgb(pwmPins, led.WHITE)
+leds.solid_rgb(pwmPins, leds.WHITE)
 
 # Read our location from NVS
 latitude, longitude = utils.read_location_from_nvs()
@@ -57,9 +57,9 @@ while True:
     # or until the time interval has expired.
     result = 0
     if pulse:
-        result = led.breathe_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS)
+        result = leds.breathe_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS)
     else:
-        result = led.solid_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS)
+        result = leds.solid_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS)
 
     if result == 1:
         # Key was hit, enter console. Blocks until the user types 'exit' or reboots.
