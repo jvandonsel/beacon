@@ -3,6 +3,8 @@ import network
 import utils
 import time
 
+is_connected = False
+
 def start_network():
     # type: () -> None
     """
@@ -23,6 +25,8 @@ def start_network():
         utils.check_for_prompt()
 
     print(f"WiFi connected to ssid {ssid}, IP={wlan.ifconfig()[0]}")
+    global is_connected
+    is_connected = True
 
     # Start the WebREPL
     webrepl.start()

@@ -101,8 +101,10 @@ def breathe_wait(pwmPins, rgb, duration_seconds):
             duty_ns = DUTY_NS_MAX
             # We finished a cycle. Check if our timer has elapsed
             if time.time() - start_time_secs > duration_seconds:
+                # Indicate that we timed out
                 return 0
         time.sleep(step_size_secs)
+
     # Indicate that a key was hit
     return 1
 
@@ -121,8 +123,10 @@ def solid_wait(pwmPins, rgb, duration_seconds):
         solid_rgb(pwmPins, rgb)
         # Check if our timer has elapsed
         if time.time() - start_time_secs > duration_seconds:
+            # Indicate that we timed out
             return 0
         time.sleep(1)
+        
     # Indicate that a key was hit
     return 1
 

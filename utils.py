@@ -1,6 +1,7 @@
 import json
 import esp32
 import uselect
+import wifi
 import sys
 
 
@@ -26,6 +27,8 @@ def console():
             print("   Latitude: ", latitude)
             print("   Longitude: ", longitude)
             print("   SSID: ", ssid)
+            print("   Wifi Connected?",  wifi.is_connected)
+
         elif cmd == "wifi":
             print("Set WiFi configuration")
             try:
@@ -35,6 +38,7 @@ def console():
                 print('Saved.')
             except Exception as e:
                 print("Failed saving: ", e)
+                
         elif cmd == "location":
             print("Set location:")
             try:
@@ -45,18 +49,20 @@ def console():
             except Exception as e:
                 print("Failed saving: ", e)
         
-        elif cmd == "help":
+        elif cmd == "help" or cmd == "?":
             print("Commands: ")
             print("     about     -     Show info about this device")
             print("     wifi      -     Set WiFi username, password")
             print("     location  -     Set location latitude, longitude")
             print()
+
         elif cmd == "quit" or cmd == "exit":
             # Empty the keyboard input buffer
             while read_one_char():
                 pass
             print("Resuming weather polling.")
             return
+        
         else:
             print("Unrecognized command")
 

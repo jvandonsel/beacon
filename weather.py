@@ -31,6 +31,13 @@ class WeatherCode:
     THUNDERSTORM_WITH_HAIL = 96
     THUNDERSTORM_WITH_HAIL2 = 99
 
+
+SUNNY_CODES  = {
+    WeatherCode.SUNNY,
+    WeatherCode.MAINLY_SUNNY
+}
+    
+
 RAIN_CODES = {
     WeatherCode.LIGHT_DRIZZLE,
     WeatherCode.DRIZZLE,
@@ -98,7 +105,7 @@ def is_snow(code):
     return code in SNOW_CODES
 
 def is_sun(code):
-    return code == WeatherCode.SUNNY
+    return code in SUNNY_CODES
 
 def is_clouds(code):
     return code in CLOUD_CODES
@@ -136,6 +143,8 @@ def query_weather(latitude, longitude):
     """
     url = get_weather_url(latitude, longitude)
     code = query_weather_code(url)
+
+    # Convert the weather code into a coarse WeatherValue
     if is_sun(code):
         return WeatherValue.SUN
     if is_clouds(code):
