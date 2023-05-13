@@ -7,7 +7,7 @@ if [ "$1" == "" ]; then
 fi
 password=$1
 
-BOARD_IP=192.168.1.13
+BOARD_IP=192.168.1.22
 WEBREPL=~/code/webrepl/webrepl/webrepl_cli.py
 # PYBOARD=~/code/micropython/tools/pyboard.py
 

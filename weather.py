@@ -124,14 +124,17 @@ def query_weather_code(url):
 
     TODO: Be smarter about choosing the day/time of the weather code.
     """
-
     code = -1
-    with urequests.get(url) as resp:
-        try:
-            print("status=:", resp.status_code)
-            code = resp.json()['daily']['weathercode'][0]
-        except Exception as e:
+    resp = None
+    try:
+        resp = urequests.get(url)
+        print("status=:", resp.status_code)
+        code = resp.json()['daily']['weathercode'][0]
+    except Exception as e:
             print("Caught error querying weather API:", e)
+    finally:
+        if resp:
+            resp.close()
 
     return code
 
