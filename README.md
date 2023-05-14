@@ -5,6 +5,7 @@ This project is meant to replicate the famous weather beacon from Boston's [Berk
 
 This replica is housed in a small lantern and is powered by a USB cable connected to a wall adapter. An ESP32 inside the beacon connects to the local WiFi network to fetch the weather forecast for your location. It then lights LEDs with a color and pattern indicating the weather.
 
+![](https://github.com/jvandonsel/beacon/blob/main/lantern1.jpg)
 
 ## The Berkeley Building Weather Beacon
 There's an old mnemonic poem for the color scheme of the Berkeley Building beacon:
@@ -47,7 +48,9 @@ I ended up single-threading everything, with polling loops and using select() to
 There's no Micropython type annotation library available, but comment-based type annotations kinda work, and are better than nothing.
 
 ## Construction Notes
-TODO
+I used perfboard and cut out a circular shape with a Dremel.  I also needed to Dremel out a hole near the base of the lantern to accomodate a USB plug.  Some plastic screws and standoffs were enough to hold the board in place.
+
+The LEDs themselves are supported only by their wires, which are bundled together and are fairly stiff, but it's still a pain to get the 4 individual LEDs positioned in the center of the lantern when I push the entire assembly in place.
 
 ## Weather API
 The beacon uses [OpenMeteo](https://open-meteo.com/en/docs) for the weather API. This API returns JSON weather info with WMO numeric weather codes rather than text descriptions.
