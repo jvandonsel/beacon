@@ -5,7 +5,7 @@ This project is meant to replicate the famous weather beacon from Boston's [Berk
 
 This replica is housed in a small lantern and is powered by a USB cable connected to a wall adapter. An ESP32 inside the beacon connects to the local WiFi network to fetch the weather forecast for your location. It then lights LEDs with a color and pattern indicating the weather.
 
-![](https://github.com/jvandonsel/beacon/blob/main/lantern1.jpg)
+![](https://github.com/jvandonsel/beacon/blob/main/lantern.jpg)
 
 ## The Berkeley Building Weather Beacon
 There's an old mnemonic poem for the color scheme of the Berkeley Building beacon:
@@ -52,7 +52,7 @@ I used perfboard and cut out a circular shape with a Dremel.  I also needed to D
 
 The LEDs themselves are supported only by their wires, which are bundled together and are fairly stiff, but it's still a pain to get the 4 individual LEDs positioned in the center of the lantern when I push the entire assembly in place.
 
-![](https://github.com/jvandonsel/beacon/blob/main/lantern2.jpg)
+![](https://github.com/jvandonsel/beacon/blob/main/lantern-bottom.jpg)
 
 
 ## Weather API
