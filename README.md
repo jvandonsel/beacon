@@ -52,6 +52,9 @@ I used perfboard and cut out a circular shape with a Dremel.  I also needed to D
 
 The LEDs themselves are supported only by their wires, which are bundled together and are fairly stiff, but it's still a pain to get the 4 individual LEDs positioned in the center of the lantern when I push the entire assembly in place.
 
+![](https://github.com/jvandonsel/beacon/blob/main/lantern2.jpg)
+
+
 ## Weather API
 The beacon uses [OpenMeteo](https://open-meteo.com/en/docs) for the weather API. This API returns JSON weather info with WMO numeric weather codes rather than text descriptions.
 
