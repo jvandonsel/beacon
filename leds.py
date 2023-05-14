@@ -3,9 +3,9 @@ import utils
 import time
 
 # GPIO pins for PWM
-RED_GPIO = 16
-BLUE_GPIO = 17
-GREEN_GPIO = 21
+BLUE_GPIO = 16
+GREEN_GPIO = 17
+RED_GPIO = 21
 
 # PWM period in us
 LED_PWM_PERIOD_US = 1000
@@ -79,7 +79,7 @@ def breathe_wait(pwmPins, rgb, duration_seconds):
            we will exit after the next full cycle.
     @return 0 if timeout expired, 1 if key was hit
     """
-    breath_period_secs = 2
+    breath_period_secs = 0.9
     step_size_secs = 0.010
     num_steps = int(breath_period_secs / step_size_secs)
     duty_step_ns = int(DUTY_NS_MAX / num_steps)
