@@ -143,18 +143,27 @@ def read_wifi_info_from_nvs():
         return (map['ssid'], map['password'])
     except:
         return ('', '')
-
-def get_utc_hours():
-
+    
+def sync_ntp():
     # Try a few times. Micropython NTP library is not very reliable.
     for i in range(5):
         try:
             ntptime.settime()
-            hours = time.localtime()[3]
-            print("Successfully got NTP hours:", hours)
-            return hours
+            print("Successfully got NTP  time")
+            break
         except Exception as e:
             print("Failed to get NTP time:", e)
             time.sleep(10)
 
-    return -1
+def get_local_time(utc_offset):
+    (h, m) = get_utc_time()
+    if h == None:
+        # NTP is flaky in micropython
+        return (int(utc_offset), 0)
+    else:
+        return (int((h + utc_offset) % 24), m)
+    
+def get_utc_time():
+    hours = time.localtime()[3]
+    minutes = time.localtime()[4]
+    return (hours, minutes)

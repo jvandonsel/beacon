@@ -1,5 +1,5 @@
 import urequests
-from utils import get_utc_hours
+from utils import get_local_time
 
 # WMO weather codes. See https://open-meteo.com/en/docs
 class WeatherCode:
@@ -77,13 +77,11 @@ FOG_CODES = {
     WeatherCode.FOGGY2
 }
 
-local_hour = 0
+utc_offset_hours = 0
 
-def get_local_hour():
-    """
-    The Weather module has access to the UTC TZ offset, so we'll vend local time here.
-    """
-    return local_hour
+def get_utc_offset_hours():
+    return utc_offset_hours
+
 
 # Coarse weather classification
 class WeatherValue:
@@ -141,24 +139,17 @@ def query_weather_code(latitude, longitude):
         resp = urequests.get(url)
         resp_json = resp.json()
 
-        # Determine UTC time hours
-        utc_hours = get_utc_hours()
-        if utc_hours == -1:
-            # NTP in micropython is flaky. Just keep on keepin on.
-            utc_hours = 0
-        
+        global utc_offset_hours
         utc_offset_hours = int(resp_json['utc_offset_seconds']) / 3600
         print("Using UTC offset=", utc_offset_hours)
 
-        # FIXME: wrapping is not correct here. We would cross days.
-        global local_hour
-        local_hour = int((utc_hours + utc_offset_hours) % 24)
-
-        print("Using local hour ", local_hour)
+        # Fetch local time
+        (hour, minute) = get_local_time(utc_offset_hours)
+        print("Using local hour ", hour)
 
         # Collect a histogram of the weather codes for the day, starting with the current local_hour
         map = {}
-        for h in range(local_hour, 23):
+        for h in range(hour, 23):
             code = resp_json['hourly']['weathercode'][h]
             map[code] = map.get(code, 0) + 1
 

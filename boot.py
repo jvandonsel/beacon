@@ -46,34 +46,34 @@ leds.solid_rgb(pwmPins, leds.WHITE)
 latitude, longitude = utils.read_location_from_nvs()
 print("Read lat=", latitude, "longitude=", longitude)
 
-WEATHER_POLL_INTERVAL_SECS = 3600
+WEATHER_POLL_INTERVAL_SECS = 900
 
 while True:
+    utils.sync_ntp()
+
     wv = weather.query_weather(latitude, longitude)
     color, pulse = weather_to_color(wv)
     print("Weather:", weather.WeatherValue.to_string(wv), " color:", color.to_str(), ", pulse:", pulse)
     
-    # Get the local hour
-    local_hour = weather.get_local_hour()
+    # Get the local time
+    (local_hour, local_minute) = utils.get_local_time(weather.get_utc_offset_hours())
+    print(f"Local time: {str(local_hour)}:{str(local_minute)}")
 
-    # Dial down the brightness if it's very late
-    brightness = 1.0
-    if local_hour <=7 or local_hour >= 23:
-        brightness = 0.1
-
-    print("Local hour:", local_hour, " Brightness:", brightness)
-
-    # Display an LED pattern based on the weather value. These calls block until a serial character is received
-    # or until the time interval has expired.
-    result = 0
-    if pulse:
-        result = leds.breathe_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS, brightness)
+    # Go to nightlight mode if it's very late
+    if local_hour <= 6 or local_hour >= 23:
+        result = leds.solid_wait(pwmPins, leds.WHITE, WEATHER_POLL_INTERVAL_SECS, 0.1)
     else:
-        result = leds.solid_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS, brightness)
+        # Display an LED pattern based on the weather value. These calls block until a serial character is received
+        # or until the time interval has expired.
+        result = 0
+        if pulse:
+            result = leds.breathe_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS)
+        else:
+            result = leds.solid_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS)
 
-    if result == 1:
-        # Key was hit, enter console. Blocks until the user types 'exit' or reboots.
-        utils.console()
+        if result == 1:
+            # Key was hit, enter console. Blocks until the user types 'exit' or reboots.
+            utils.console()
 
 
     

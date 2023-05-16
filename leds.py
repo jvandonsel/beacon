@@ -68,7 +68,7 @@ def init_pwm(pin, duty):
     return pwm
 
 
-def breathe_wait(pwmPins, rgb, duration_seconds, brightness):
+def breathe_wait(pwmPins, rgb, duration_seconds, brightness = 1.0):
     # type: (PwmPins, RGB, float, float) -> int
     """
     Displays the "breathe" pattern. Blocks for the given time period, or until a key is hit.
@@ -109,7 +109,7 @@ def breathe_wait(pwmPins, rgb, duration_seconds, brightness):
     # Indicate that a key was hit
     return 1
 
-def solid_wait(pwmPins, rgb, duration_seconds, brightness):
+def solid_wait(pwmPins, rgb, duration_seconds, brightness = 1.0):
     # type:  (PwmPins, RGB, float,  float) -> int
     """
     Displays a solid pattern. Blocks for the given time period, or until a key is hit.
