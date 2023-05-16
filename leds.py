@@ -68,8 +68,8 @@ def init_pwm(pin, duty):
     return pwm
 
 
-def breathe_wait(pwmPins, rgb, duration_seconds):
-    # type: (PwmPins, RGB, float) -> int
+def breathe_wait(pwmPins, rgb, duration_seconds, brightness):
+    # type: (PwmPins, RGB, float, float) -> int
     """
     Displays the "breathe" pattern. Blocks for the given time period, or until a key is hit.
 
@@ -77,6 +77,7 @@ def breathe_wait(pwmPins, rgb, duration_seconds):
     @param rgb RGB color to display
     @param duration_seconds Duration to display pattern. After duration has expired
            we will exit after the next full cycle.
+    @param brightness Brightness of the LEDs. 0.0-1.0
     @return 0 if timeout expired, 1 if key was hit
     """
     breath_period_secs = 0.9
@@ -89,9 +90,9 @@ def breathe_wait(pwmPins, rgb, duration_seconds):
     direction = -1
     start_time_secs = time.time()
     while not utils.read_one_char():
-        pwmPins.red.duty_ns(int(rgb.red * duty_ns/ 255))
-        pwmPins.green.duty_ns(int(rgb.green * duty_ns / 255))
-        pwmPins.blue.duty_ns(int(rgb.blue * duty_ns / 255))
+        pwmPins.red.duty_ns(int(rgb.red * duty_ns * brightness/ 255))
+        pwmPins.green.duty_ns(int(rgb.green * duty_ns * brightness / 255))
+        pwmPins.blue.duty_ns(int(rgb.blue * duty_ns * brightness/ 255))
         duty_ns += duty_step_ns * direction
         if duty_ns < 0:
             direction = 1
@@ -108,19 +109,21 @@ def breathe_wait(pwmPins, rgb, duration_seconds):
     # Indicate that a key was hit
     return 1
 
-def solid_wait(pwmPins, rgb, duration_seconds):
-    # type:  (PwmPins, RGB, float) -> int
+def solid_wait(pwmPins, rgb, duration_seconds, brightness):
+    # type:  (PwmPins, RGB, float,  float) -> int
     """
     Displays a solid pattern. Blocks for the given time period, or until a key is hit.
 
     @param pwms PWM object
     @param rgb RGB color to display
     @param duration_seconds Duration to display the color
+    @param brightness Brightness of the LEDs. 0.0-1.0
+
     @return 0 if timeout expired, 1 if key was hit
     """
     start_time_secs = time.time()
     while not utils.read_one_char():
-        solid_rgb(pwmPins, rgb)
+        solid_rgb(pwmPins, rgb, brightness)
         # Check if our timer has elapsed
         if time.time() - start_time_secs > duration_seconds:
             # Indicate that we timed out
@@ -140,16 +143,17 @@ def solid_(pwm, duty):
     """
     pwm.duty_ns(int(DUTY_NS_MAX * duty))
 
-def solid_rgb(pwmPins, rgb):
-    # type: (PwmPins, RGB) -> None
+def solid_rgb(pwmPins, rgb, brightness = 1.0):
+    # type: (PwmPins, RGB, float) -> None
     """
     Sets the given pwm pins to the given RGB color.
     @param pwms PWM pins
     @param rgb RGB color
+    @param brightness Brightness of the LEDs. 0.0-1.0
     """
-    solid_(pwmPins.red, rgb.red / 255.0)
-    solid_(pwmPins.green, rgb.green / 255.0)
-    solid_(pwmPins.blue, rgb.blue / 255.0)
+    solid_(pwmPins.red, rgb.red * brightness/ 255.0)
+    solid_(pwmPins.green, rgb.green * brightness/ 255.0)
+    solid_(pwmPins.blue, rgb.blue * brightness/ 255.0)
     
 
 

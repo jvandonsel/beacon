@@ -1,4 +1,5 @@
 import urequests
+from utils import get_utc_hours
 
 # WMO weather codes. See https://open-meteo.com/en/docs
 class WeatherCode:
@@ -76,6 +77,14 @@ FOG_CODES = {
     WeatherCode.FOGGY2
 }
 
+local_hour = 0
+
+def get_local_hour():
+    """
+    The Weather module has access to the UTC TZ offset, so we'll vend local time here.
+    """
+    return local_hour
+
 # Coarse weather classification
 class WeatherValue:
     UNKNOWN = 0
@@ -113,23 +122,54 @@ def is_clouds(code):
 def is_fog(code):
     return code in FOG_CODES
 
-def get_weather_url(latitude, longitude):
-    return f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=weathercode&timezone=auto&forecast_days=1"
 
-def query_weather_code(url):
-    # type: (str) -> int
+
+def query_weather_code(latitude, longitude):
+    # type: (float, float) -> int
     """
     Queries the weather API for the current weather for the current location.
     Returns the numeric WMO weather code. Returns -1 it not found.
-
-    TODO: Be smarter about choosing the day/time of the weather code.
     """
+
+    # Query the hourly forecast for 1 day
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=weathercode&timezone=auto&forecast_days=1"
+
     code = -1
     resp = None
     try:
+        # Query the weather
         resp = urequests.get(url)
-        print("status=:", resp.status_code)
-        code = resp.json()['daily']['weathercode'][0]
+        resp_json = resp.json()
+
+        # Determine UTC time hours
+        utc_hours = get_utc_hours()
+        if utc_hours == -1:
+            # NTP in micropython is flaky. Just keep on keepin on.
+            utc_hours = 0
+        
+        utc_offset_hours = int(resp_json['utc_offset_seconds']) / 3600
+        print("Using UTC offset=", utc_offset_hours)
+
+        # FIXME: wrapping is not correct here. We would cross days.
+        global local_hour
+        local_hour = int((utc_hours + utc_offset_hours) % 24)
+
+        print("Using local hour ", local_hour)
+
+        # Collect a histogram of the weather codes for the day, starting with the current local_hour
+        map = {}
+        for h in range(local_hour, 23):
+            code = resp_json['hourly']['weathercode'][h]
+            map[code] = map.get(code, 0) + 1
+
+        # Find the most common weather code
+        max_count = 0
+        code = -1
+        for k, v in map.items():
+            if v > max_count:
+                max_count = v
+                code = k
+        
     except Exception as e:
             print("Caught error querying weather API:", e)
     finally:
@@ -144,8 +184,7 @@ def query_weather(latitude, longitude):
     Query the weather for the given lat/long.
     @return a WeatherValue
     """
-    url = get_weather_url(latitude, longitude)
-    code = query_weather_code(url)
+    code = query_weather_code(latitude, longitude)
 
     # Convert the weather code into a coarse WeatherValue
     if is_sun(code):

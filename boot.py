@@ -52,14 +52,24 @@ while True:
     wv = weather.query_weather(latitude, longitude)
     color, pulse = weather_to_color(wv)
     print("Weather:", weather.WeatherValue.to_string(wv), " color:", color.to_str(), ", pulse:", pulse)
+    
+    # Get the local hour
+    local_hour = weather.get_local_hour()
+
+    # Dial down the brightness if it's very late
+    brightness = 1.0
+    if local_hour <=7 or local_hour >= 23:
+        brightness = 0.1
+
+    print("Local hour:", local_hour, " Brightness:", brightness)
 
     # Display an LED pattern based on the weather value. These calls block until a serial character is received
     # or until the time interval has expired.
     result = 0
     if pulse:
-        result = leds.breathe_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS)
+        result = leds.breathe_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS, brightness)
     else:
-        result = leds.solid_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS)
+        result = leds.solid_wait(pwmPins, color, WEATHER_POLL_INTERVAL_SECS, brightness)
 
     if result == 1:
         # Key was hit, enter console. Blocks until the user types 'exit' or reboots.

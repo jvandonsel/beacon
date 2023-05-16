@@ -3,6 +3,8 @@ import esp32
 import uselect
 import wifi
 import sys
+import ntptime
+import time
 
 
 # Flash storage
@@ -142,3 +144,17 @@ def read_wifi_info_from_nvs():
     except:
         return ('', '')
 
+def get_utc_hours():
+
+    # Try a few times. Micropython NTP library is not very reliable.
+    for i in range(5):
+        try:
+            ntptime.settime()
+            hours = time.localtime()[3]
+            print("Successfully got NTP hours:", hours)
+            return hours
+        except Exception as e:
+            print("Failed to get NTP time:", e)
+            time.sleep(10)
+
+    return -1
