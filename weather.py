@@ -149,7 +149,7 @@ def query_weather_code(latitude, longitude):
 
         # Collect a histogram of the weather codes for the day, starting with the current local_hour
         map = {}
-        for h in range(hour, 23):
+        for h in range(hour, 24):
             code = resp_json['hourly']['weathercode'][h]
             map[code] = map.get(code, 0) + 1
 

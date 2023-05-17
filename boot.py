@@ -49,8 +49,10 @@ print("Read lat=", latitude, "longitude=", longitude)
 WEATHER_POLL_INTERVAL_SECS = 900
 
 while True:
+    # Sync to an NTP server periodically, since our clock is prone to drift
     utils.sync_ntp()
 
+    # Check the weather
     wv = weather.query_weather(latitude, longitude)
     color, pulse = weather_to_color(wv)
     print("Weather:", weather.WeatherValue.to_string(wv), " color:", color.to_str(), ", pulse:", pulse)
@@ -61,7 +63,7 @@ while True:
 
     # Go to nightlight mode if it's very late
     if local_hour <= 6 or local_hour >= 23:
-        result = leds.solid_wait(pwmPins, leds.WHITE, WEATHER_POLL_INTERVAL_SECS, 0.1)
+        result = leds.solid_wait(pwmPins, leds.WHITE, WEATHER_POLL_INTERVAL_SECS, 0.05)
     else:
         # Display an LED pattern based on the weather value. These calls block until a serial character is received
         # or until the time interval has expired.

@@ -37,7 +37,7 @@ class RGB:
         return f"r:{self.red} g:{self.green} b:{self.blue}"
     
 # Some random colors, tweaked for my particular LEDs
-WHITE    = RGB(0xFF, 0xFF, 0xFF)
+WHITE    = RGB(0xFF, 0xE0, 0xE0)
 RED      = RGB(0xFF, 0, 0)
 GREEN    = RGB(0, 0xFF, 0)
 BLUE     = RGB(0, 0, 0xFF)

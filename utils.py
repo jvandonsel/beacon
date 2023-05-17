@@ -84,7 +84,8 @@ def read_one_char():
 def check_for_prompt():
     # type: () -> None
     """
-    Checks if a serial character is present. If so, enters the interactive console.
+    Checks if a serial character is present. If so, enters the interactive console,
+    which then blocks until it' exited.
     """
     if read_one_char():
             console()
@@ -145,6 +146,9 @@ def read_wifi_info_from_nvs():
         return ('', '')
     
 def sync_ntp():
+    """
+    Sync our local clock to an NTP server
+    """
     # Try a few times. Micropython NTP library is not very reliable.
     for i in range(5):
         try:
@@ -156,14 +160,23 @@ def sync_ntp():
             time.sleep(10)
 
 def get_local_time(utc_offset):
+    # type:  (int) -> (int, int)
+    """
+    @param utc_offset Offset from UTC in hours
+    @return (hour,minute) of local time
+    """
     (h, m) = get_utc_time()
     if h == None:
-        # NTP is flaky in micropython
-        return (int(utc_offset), 0)
-    else:
-        return (int((h + utc_offset) % 24), m)
+        # NTP is flaky in micropython, so try to ride through it
+        h = 0
+    return (int((h + utc_offset) % 24), m)
     
 def get_utc_time():
+    # type:  () -> (int, int)
+    """
+    Return the current hours and minutes in UTC time.
+    @return (hours, minutes)
+    """
     hours = time.localtime()[3]
     minutes = time.localtime()[4]
     return (hours, minutes)
