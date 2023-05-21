@@ -38,7 +38,8 @@ The IRL540PBF N-Channel MOSFETs are really handy for this sort of LED PWM applic
 The LEDs I chose have a recommended maximum current of 20 mA per color. I used 4 LEDS in my beacon, so this is a maximum of 80 mA per color, or 240 mA total.  Resistor values were chosen to keep the current just under this per-LED current limit, with a 5V rail. They can certainly be overdriven for a brighter beacon, but obviously their lifetime will be shortened.
 
 ## Schematic
-TODO
+![PDF Schematic](https://github.com/jvandonsel/beacon/blob/main/beacon-schematic.pdf)
+
 
 ## Software Notes
 This is my first time using [MicroPython](https://docs.micropython.org). It has some deficiencies, especially when it comes to threading, but it's certainly quicker to throw projects together in MicroPython than writing directly to the Espressif IDF API in C.
@@ -47,10 +48,11 @@ I ended up single-threading everything, with polling loops and using select() to
 
 There's no Micropython type annotation library available, but comment-based type annotations kinda work, and are better than nothing.
 
+NTP is used to determine UTC time. The Meteo weather library returns a UTC time zone offset for the given latitude/longitude along with the weather, which I use to determine local time. Local time is then used to determine a single weather forecase for the next 8 hours.  NTP on MicroPython is flaky, but more or less works.
+
+
 ## Construction Notes
 I used perfboard and cut out a circular shape with a Dremel.  I also needed to Dremel out a hole near the base of the lantern to accomodate a USB plug.  Some plastic screws and standoffs were enough to hold the board in place.
-
-The LEDs themselves are supported only by their wires, which are bundled together and are fairly stiff, but it's still a pain to get the 4 individual LEDs positioned in the center of the lantern when I push the entire assembly in place.
 
 ![](https://github.com/jvandonsel/beacon/blob/main/lantern-bottom.jpg)
 
@@ -87,7 +89,3 @@ Blinking <span style="color:green">green</span> - Fog
 Solid <span style="color:magenta">magenta</span> - No WiFi connection
 
 Solid white - No weather received, or unknown weather code
-
-
-## TODO
-- Determine user location dynamically rather than requiring a latitude/longitude input

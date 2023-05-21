@@ -122,17 +122,17 @@ def is_fog(code):
 
 
 
-def query_weather_code(latitude, longitude):
-    # type: (float, float) -> int
+def query_weather(latitude, longitude):
+    # type: (float, float) -> WeatherValue
     """
-    Queries the weather API for the current weather for the current location.
-    Returns the numeric WMO weather code. Returns -1 it not found.
+    Queries the weather API for the current Value for the current location.
+    Returns WeatherValue.UNKNOWN if not found.
     """
 
-    # Query the hourly forecast for 1 day
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=weathercode&timezone=auto&forecast_days=1"
+    # Query the hourly forecast for 2 days, so we can look forward
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=weathercode&timezone=auto&forecast_days=2"
 
-    code = -1
+    result = WeatherValue.UNKNOWN
     resp = None
     try:
         # Query the weather
@@ -147,19 +147,25 @@ def query_weather_code(latitude, longitude):
         (hour, minute) = get_local_time(utc_offset_hours)
         print("Using local hour ", hour)
 
-        # Collect a histogram of the weather codes for the day, starting with the current local_hour
-        map = {}
-        for h in range(hour, 24):
-            code = resp_json['hourly']['weathercode'][h]
-            map[code] = map.get(code, 0) + 1
 
-        # Find the most common weather code
+        # Collect a histogram of the weather values for remainder of day, 
+        # starting with the current local_hour and going for LOOKAHEAD_HOURS.
+        # The JSON weather was queried for 2 days and the hourly data
+        # is contiguous, so don't wrap at a day.
+        LOOKAHEAD_HOURS = 8
+        map = {}
+        for h in range(hour + 1, hour + LOOKAHEAD_HOURS):
+            value = weather_code_to_value(resp_json['hourly']['weathercode'][h])
+            print(f"Considering hour {h} value {WeatherValue.to_string(value)}")
+            map[value] = map.get(value, 0) + 1
+
+        # Find the most common weather value
         max_count = 0
-        code = -1
+        result = WeatherValue.UNKNOWN
         for k, v in map.items():
             if v > max_count:
                 max_count = v
-                code = k
+                result = k
         
     except Exception as e:
             print("Caught error querying weather API:", e)
@@ -167,17 +173,15 @@ def query_weather_code(latitude, longitude):
         if resp:
             resp.close()
 
-    return code
+    return result
 
-def query_weather(latitude, longitude):
-    # type:  (float, float) -> WeatherValue
+
+def weather_code_to_value(code):
+    # type: (int) -> WeatherValue
     """
-    Query the weather for the given lat/long.
+    Convert a WMO weather code into a coarse weather value.
     @return a WeatherValue
     """
-    code = query_weather_code(latitude, longitude)
-
-    # Convert the weather code into a coarse WeatherValue
     if is_sun(code):
         return WeatherValue.SUN
     if is_clouds(code):
@@ -191,3 +195,5 @@ def query_weather(latitude, longitude):
     
     print("Unrecognized weather code ", code)
     return WeatherValue.UNKNOWN
+
+
