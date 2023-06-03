@@ -82,7 +82,7 @@ Blinking <span style="color:blue">blue</span> - Cloudy
 
 Solid <span style="color:red">red</span> - Rain
 
-Blinking <span style="color:red">red</span> - Snow
+Blinking <span style="color:red">red</span> - Snow or Thunderstorm
 
 Blinking <span style="color:green">green</span> - Fog
 

@@ -21,6 +21,8 @@ def weather_to_color(w):
         return leds.BLUE, True
     if w == weather.WeatherValue.RAIN:
         return leds.RED, False
+    if w == weather.WeatherValue.THUNDERSTORM:
+        return leds.RED, True
     if w == weather.WeatherValue.SNOW:
         return leds.RED, True
     if w == weather.WeatherValue.FOG:
@@ -53,7 +55,7 @@ while True:
     utils.sync_ntp()
 
     # Check the weather
-    wv = weather.query_weather(latitude, longitude)
+    wv = weather.query_weather_value(latitude, longitude)
     color, pulse = weather_to_color(wv)
     print("Weather:", weather.WeatherValue.to_string(wv), " color:", color.to_str(), ", pulse:", pulse)
     

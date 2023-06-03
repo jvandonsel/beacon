@@ -53,6 +53,9 @@ RAIN_CODES = {
     WeatherCode.LIGHT_SHOWERS,
     WeatherCode.SHOWERS,
     WeatherCode.HEAVY_SHOWERS,
+}
+
+THUNDERSTORM_CODES = {
     WeatherCode.THUNDERSTORM,
     WeatherCode.THUNDERSTORM_WITH_HAIL,
     WeatherCode.THUNDERSTORM_WITH_HAIL2
@@ -83,14 +86,16 @@ def get_utc_offset_hours():
     return utc_offset_hours
 
 
-# Coarse weather classification
+# Coarse weather classification, sorted from least severe to most severe
 class WeatherValue:
-    UNKNOWN = 0
-    SUN = 1
-    RAIN = 2
-    SNOW = 3
-    CLOUDS = 4
-    FOG = 5
+    LEAST_SEVERE = 0
+    SUN = 0
+    CLOUDS = 1
+    FOG = 2
+    RAIN = 3
+    SNOW = 4
+    THUNDERSTORM = 4
+    UNKNOWN = 6
 
     weather_value_to_string = {
         UNKNOWN: "UNKNOWN",
@@ -98,7 +103,8 @@ class WeatherValue:
         RAIN: "RAIN",
         SNOW: "SNOW",
         CLOUDS: "CLOUDS",
-        FOG: "FOG"
+        FOG: "FOG",
+        THUNDERSTORM: "THUNDERSTORM"
     }
 
     def to_string(value):
@@ -107,6 +113,9 @@ class WeatherValue:
 
 def is_rain(code):
     return code in RAIN_CODES
+
+def is_thunderstorm(code):
+    return code in THUNDERSTORM_CODES
 
 def is_snow(code):
     return code in SNOW_CODES
@@ -121,18 +130,19 @@ def is_fog(code):
     return code in FOG_CODES
 
 
-
-def query_weather(latitude, longitude):
+def query_weather_value(latitude, longitude):
     # type: (float, float) -> WeatherValue
     """
-    Queries the weather API for the current Value for the current location.
+    Queries the weather API and returns a forecast for the current location
+    for the next few hours.
+    
     Returns WeatherValue.UNKNOWN if not found.
     """
 
     # Query the hourly forecast for 2 days, so we can look forward
     url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=weathercode&timezone=auto&forecast_days=2"
 
-    result = WeatherValue.UNKNOWN
+    most_severe_value = WeatherValue.LEAST_SEVERE
     resp = None
     try:
         # Query the weather
@@ -147,33 +157,23 @@ def query_weather(latitude, longitude):
         (hour, minute) = get_local_time(utc_offset_hours)
         print("Using local hour ", hour)
 
-
-        # Collect a histogram of the weather values for remainder of day, 
-        # starting with the current local_hour and going for LOOKAHEAD_HOURS.
+        # Determine the most severe weather during the next LOOKAHEAD_HOURS.
         # The JSON weather was queried for 2 days and the hourly data
         # is contiguous, so don't wrap at a day.
         LOOKAHEAD_HOURS = 8
-        map = {}
         for h in range(hour + 1, hour + LOOKAHEAD_HOURS):
             value = weather_code_to_value(resp_json['hourly']['weathercode'][h])
-            print(f"Considering hour {h} value {WeatherValue.to_string(value)}")
-            map[value] = map.get(value, 0) + 1
+            if value > most_severe_value:
+                most_severe_value = value
 
-        # Find the most common weather value
-        max_count = 0
-        result = WeatherValue.UNKNOWN
-        for k, v in map.items():
-            if v > max_count:
-                max_count = v
-                result = k
-        
     except Exception as e:
             print("Caught error querying weather API:", e)
+            most_severe_value = WeatherValue.UNKNOWN
     finally:
         if resp:
             resp.close()
 
-    return result
+    return most_severe_value
 
 
 def weather_code_to_value(code):
@@ -188,6 +188,8 @@ def weather_code_to_value(code):
         return WeatherValue.CLOUDS
     if is_rain(code):
         return WeatherValue.RAIN
+    if is_thunderstorm(code):
+        return WeatherValue.THUNDERSTORM
     if is_snow(code):
         return WeatherValue.SNOW
     if is_fog(code):
