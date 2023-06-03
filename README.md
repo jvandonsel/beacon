@@ -3,7 +3,7 @@
 
 This project is meant to replicate the famous weather beacon from Boston's [Berkeley Building](https://en.wikipedia.org/wiki/Berkeley_Building), formerly known as the Old John Hancock Building.
 
-This replica is housed in a small lantern and is powered by a USB cable connected to a wall adapter. An ESP32 inside the beacon connects to the local WiFi network to fetch the weather forecast for your location. It then lights LEDs with a color and pattern indicating the weather.
+This replica is housed in a small lantern and is powered by a USB cable connected to a wall adapter. An ESP32 inside the beacon connects to the local WiFi network to fetch the weather forecast for your location from a public weather API. It then lights LEDs with a color and pattern indicating the weather.
 
 ![](https://github.com/jvandonsel/beacon/blob/main/lantern.jpg)
 
@@ -33,7 +33,7 @@ The Berkeley Beacon also will flash red during baseball season to indicate that 
 - Misc. Hardware
 
 ## Hardware Notes
-The IRL540PBF N-Channel MOSFETs are really handy for this sort of LED PWM application. They have a low gate-source voltage threshold and so can be driven directly from the 3.3v GPIO pins on the ESP32 for PWM.
+The IRL540PBF N-Channel MOSFETs are really handy for this sort of LED PWM application. They have a low gate-source voltage threshold and so can be driven directly from the 3.3v GPIO pins on the ESP32 for PWM control of the LEDs.
 
 The LEDs I chose have a recommended maximum current of 20 mA per color. I used 4 LEDS in my beacon, so this is a maximum of 80 mA per color, or 240 mA total.  Resistor values were chosen to keep the current just under this per-LED current limit, with a 5V rail. They can certainly be overdriven for a brighter beacon, but obviously their lifetime will be shortened.
 
@@ -46,19 +46,23 @@ This is my first time using [MicroPython](https://docs.micropython.org). It has 
 
 I ended up single-threading everything, with polling loops and using select() to watch for serial characters from the user.
 
-There's no Micropython type annotation library available, but comment-based type annotations kinda work, and are better than nothing.
+There's no MicroPython type annotation library available, but comment-based type annotations kinda work, and are better than nothing.
 
 NTP is used to determine UTC time. The Meteo weather library returns a UTC time zone offset for the given latitude/longitude along with the weather, which I use to determine local time. Local time is then used to determine a single weather forecase for the next 8 hours.  NTP on MicroPython is flaky, but more or less works.
 
+At my family's request, the beacon stops indicating weather and turns itself into a night-light from 11:00pm to 7:00am.
+
+The actual Boston beacon blinks with a harsh on-off pattern. I chose to produce a softer pulsing pattern using PWM.
+
 
 ## Construction Notes
-I used perfboard and cut out a circular shape with a Dremel.  I also needed to Dremel out a hole near the base of the lantern to accomodate a USB plug.  Some plastic screws and standoffs were enough to hold the board in place.
+I used perfboard and cut out a circular shape with a Dremel.  I also needed to Dremel out a hole near the metal base of the lantern to accomodate a USB plug.  Some plastic screws and standoffs were enough to hold the board in place.
 
 ![](https://github.com/jvandonsel/beacon/blob/main/lantern-bottom.jpg)
 
 
 ## Weather API
-The beacon uses [OpenMeteo](https://open-meteo.com/en/docs) for the weather API. This API returns JSON weather info with WMO numeric weather codes rather than text descriptions.
+The beacon uses [OpenMeteo](https://open-meteo.com/en/docs) for the weather API. This API returns JSON weather info with WMO numeric weather codes rather than text descriptions.  The most severe weather during the next 8 hours is then chosen for display.
 
 My first choice was the [National Weather Service API](https://www.weather.gov/documentation/services-web-api) but the SSL certificate logic in MicroPython choked on the site.
 
