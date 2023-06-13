@@ -89,13 +89,13 @@ def get_utc_offset_hours():
 # Coarse weather classification, sorted from least severe to most severe
 class WeatherValue:
     LEAST_SEVERE = 0
-    SUN = 0
-    CLOUDS = 1
-    FOG = 2
-    RAIN = 3
-    SNOW = 4
-    THUNDERSTORM = 4
-    UNKNOWN = 6
+    UNKNOWN = 1
+    SUN = 1
+    CLOUDS = 2
+    FOG = 3
+    RAIN = 4
+    SNOW = 5
+    THUNDERSTORM = 6
 
     weather_value_to_string = {
         UNKNOWN: "UNKNOWN",
