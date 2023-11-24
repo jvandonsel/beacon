@@ -30,6 +30,7 @@ def console():
             print("   Longitude: ", longitude)
             print("   SSID: ", ssid)
             print("   Wifi Connected?",  wifi.is_connected)
+            print("   IP: ", wifi.get_ip())
 
         elif cmd == "wifi":
             print("Set WiFi configuration")
@@ -150,14 +151,14 @@ def sync_ntp():
     Sync our local clock to an NTP server
     """
     # Try a few times. Micropython NTP library is not very reliable.
-    for i in range(5):
+    for i in range(100):
         try:
             ntptime.settime()
-            print("Successfully got NTP  time")
+            print("Successfully got NTP  time: ", str(time.gmtime()))
             break
         except Exception as e:
             print("Failed to get NTP time:", e)
-            time.sleep(10)
+            time.sleep(20 + i * 10)
 
 def get_local_time(utc_offset):
     # type:  (int) -> (int, int)

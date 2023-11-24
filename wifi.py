@@ -30,3 +30,7 @@ def start_network():
 
     # Start the WebREPL
     webrepl.start()
+
+def get_ip():
+    wlan = network.WLAN(network.STA_IF)
+    return wlan.ifconfig()[0]

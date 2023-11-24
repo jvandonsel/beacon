@@ -48,9 +48,12 @@ print("Read lat=", latitude, "longitude=", longitude)
 
 WEATHER_POLL_INTERVAL_SECS = 900
 
+# Sync NTP
+utils.sync_ntp()
+
+daily_ntp_sync_done = True
+
 while True:
-    # Sync to an NTP server periodically, since our clock is prone to drift
-    utils.sync_ntp()
 
     # Check the weather
     wv = weather.query_weather_value(latitude, longitude)
@@ -60,6 +63,13 @@ while True:
     # Get the local time
     (local_hour, local_minute) = utils.get_local_time(weather.get_utc_offset_hours())
     print(f"Local time: {str(local_hour)}:{str(local_minute)}")
+
+    # Sync to NTP daily, since our clock is prone to drift
+    if local_hour == 0:
+        daily_ntp_sync_done = False
+    if local_hour == 1 and not daily_ntp_sync_done:
+        utils.sync_ntp()
+        daily_ntp_sync_done = True
 
     # Go to nightlight mode if it's very late
     if local_hour <= 6 or local_hour >= 23:
